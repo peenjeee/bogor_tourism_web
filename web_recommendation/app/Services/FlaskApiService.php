@@ -12,8 +12,8 @@ class FlaskApiService
 
     public function __construct()
     {
-        $this->baseUrl = env('FLASK_API_URL', 'http://localhost:5000');
-        $this->timeout = 30; // seconds
+        $this->baseUrl = rtrim((string) config('services.flask.base_url'), '/');
+        $this->timeout = (int) config('services.flask.timeout', 30);
     }
 
     /**

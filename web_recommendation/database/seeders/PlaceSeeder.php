@@ -16,8 +16,8 @@ class PlaceSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing data
-        DB::table('places')->delete();
+        // Clear existing data and reset IDs from 1.
+        DB::table('places')->truncate();
 
         // Load scraped data
         $jsonPath = null;
@@ -51,16 +51,17 @@ class PlaceSeeder extends Seeder
         $this->command->info("Found " . count($jsonData) . " destinations");
 
         $imported = 0;
-        $seenNames = [];
+        $seenUrls = [];
 
         foreach ($jsonData as $item) {
             $nama = trim($item['nama'] ?? '');
+            $url = trim($item['url'] ?? '');
 
-            // Skip empty names or duplicates
-            if (empty($nama) || isset($seenNames[$nama])) {
+            // The project dataset uses unique URLs as the 297-place count.
+            if (empty($nama) || empty($url) || isset($seenUrls[$url])) {
                 continue;
             }
-            $seenNames[$nama] = true;
+            $seenUrls[$url] = true;
 
             try {
                 // Map kategori to main 7 categories
@@ -93,7 +94,7 @@ class PlaceSeeder extends Seeder
                     'harga_tiket' => null,
                     'jam_operasional' => null,
                     'telepon' => null,
-                    'url' => $item['url'] ?? null,
+                    'url' => $url,
                     'url_gambar' => $item['url_gambar'] ?? null,
                     'tags' => null,
                     'likes' => (int) ($item['likes'] ?? 0),

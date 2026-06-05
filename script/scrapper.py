@@ -31,6 +31,50 @@ CATEGORIES = [
 
 BASE_URL = "https://sportandtourism.bogorkab.go.id"
 
+
+def normalize_place_name(value: str) -> str:
+    """Normalize destination names so duplicate titles can be removed safely."""
+    return re.sub(r"[^a-z0-9]+", " ", str(value).lower()).strip()
+
+
+def strip_multiline_trailing_spaces(value):
+    if isinstance(value, str):
+        return "\n".join(line.rstrip() for line in value.splitlines())
+    return value
+
+
+def clean_tourism_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Return the canonical clean dataset.
+
+    Canonical data keeps one row per URL first, then one row per normalized
+    destination name. If two titles match, keep the higher-liked row.
+    """
+    if df.empty:
+        return df.copy()
+
+    clean = df.copy()
+    text_cols = clean.select_dtypes(include=["object"]).columns
+    clean[text_cols] = clean[text_cols].apply(lambda col: col.map(strip_multiline_trailing_spaces))
+    clean["__row_order"] = range(len(clean))
+
+    if "url" in clean.columns:
+        clean = clean.drop_duplicates(subset="url", keep="first")
+
+    if "nama" in clean.columns:
+        clean["__nama_norm"] = clean["nama"].map(normalize_place_name)
+        clean["__likes_sort"] = pd.to_numeric(clean.get("likes", 0), errors="coerce").fillna(0)
+        clean = (
+            clean.sort_values(
+                ["__nama_norm", "__likes_sort", "__row_order"],
+                ascending=[True, False, True],
+            )
+            .drop_duplicates(subset="__nama_norm", keep="first")
+            .sort_values("__row_order")
+        )
+
+    helper_cols = ["__row_order", "__nama_norm", "__likes_sort"]
+    return clean.drop(columns=[col for col in helper_cols if col in clean.columns]).reset_index(drop=True)
+
 @dataclass
 class TourismItem:
     """Data struktur untuk item wisata dengan kolom terpisah"""
@@ -371,18 +415,18 @@ class BogorTourismScraper:
     def to_dataframe(self, items: List[TourismItem]) -> pd.DataFrame:
         return pd.DataFrame([asdict(item) for item in items])
     
-    def save_to_csv(self, items: List[TourismItem], filename: str = "bogor_tourism_data.csv"):
+    def save_to_csv(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.csv"):
         df = self.to_dataframe(items)
         df.to_csv(filename, index=False, encoding='utf-8-sig')
         print(f"💾 Saved: {filename}")
     
-    def save_to_json(self, items: List[TourismItem], filename: str = "bogor_tourism_data.json"):
+    def save_to_json(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.json"):
         data = [asdict(item) for item in items]
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"💾 Saved: {filename}")
     
-    def save_to_excel(self, items: List[TourismItem], filename: str = "bogor_tourism_data.xlsx"):
+    def save_to_excel(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.xlsx"):
         df = self.to_dataframe(items)
         df.to_excel(filename, index=False, engine='openpyxl')
         print(f"💾 Saved: {filename}")
@@ -392,23 +436,33 @@ def main():
     scraper = BogorTourismScraper(delay=1.0, scrape_details=True)
     all_items = scraper.scrape_all_categories()
     
-    df = scraper.to_dataframe(all_items)
+    df_raw = scraper.to_dataframe(all_items)
+    df_clean = clean_tourism_dataframe(df_raw)
     
     print("\n📊 KOLOM DATA:")
-    print(df.columns.tolist())
+    print(df_clean.columns.tolist())
     
     print("\n📊 PREVIEW:")
-    print(df[['nama', 'alamat', 'harga_tiket', 'jam_operasional']].head(5))
-    
-    scraper.save_to_csv(all_items)
-    scraper.save_to_json(all_items)
+    print(df_clean[['nama', 'alamat', 'harga_tiket', 'jam_operasional']].head(5))
+
+    print(f"\nRaw: {len(df_raw)} destinasi")
+    print(df_raw["kategori"].value_counts())
+
+    print(f"\nClean: {len(df_clean)} destinasi")
+    print(df_clean["kategori"].value_counts())
+
+    df_clean.to_csv("bogor_tourism_data_clean.csv", index=False, encoding="utf-8-sig")
+    df_clean.to_json("bogor_tourism_data_clean.json", orient="records", force_ascii=False, indent=2)
+    print("💾 Saved: bogor_tourism_data_clean.csv")
+    print("💾 Saved: bogor_tourism_data_clean.json")
     
     try:
-        scraper.save_to_excel(all_items)
+        df_clean.to_excel("bogor_tourism_data_clean.xlsx", index=False, engine="openpyxl")
+        print("💾 Saved: bogor_tourism_data_clean.xlsx")
     except:
         print("⚠️ Install openpyxl for Excel export")
     
-    return df
+    return df_clean
 
 
 if __name__ == "__main__":

@@ -48,20 +48,41 @@ class PlaceSeeder extends Seeder
             return;
         }
 
-        $this->command->info("Found " . count($jsonData) . " destinations");
+        $this->command->info("Found " . count($jsonData) . " scraped destinations");
 
-        $imported = 0;
+        $cleanData = [];
         $seenUrls = [];
 
         foreach ($jsonData as $item) {
             $nama = trim($item['nama'] ?? '');
             $url = trim($item['url'] ?? '');
 
-            // The project dataset uses unique URLs as the 297-place count.
             if (empty($nama) || empty($url) || isset($seenUrls[$url])) {
                 continue;
             }
+
             $seenUrls[$url] = true;
+            $nameKey = trim(preg_replace('/[^a-z0-9]+/', ' ', strtolower($nama)));
+            $likes = (int) ($item['likes'] ?? 0);
+
+            if (!isset($cleanData[$nameKey]) || $likes > (int) ($cleanData[$nameKey]['likes'] ?? 0)) {
+                $cleanData[$nameKey] = $item;
+            }
+        }
+
+        $jsonData = array_values($cleanData);
+        $this->command->info("Using " . count($jsonData) . " unique destinations");
+
+        $imported = 0;
+
+        foreach ($jsonData as $item) {
+            $nama = trim($item['nama'] ?? '');
+            $url = trim($item['url'] ?? '');
+
+            // The project dataset keeps 296 places: unique URL, then unique normalized name.
+            if (empty($nama) || empty($url)) {
+                continue;
+            }
 
             try {
                 // Map kategori to main 7 categories

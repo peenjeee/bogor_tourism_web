@@ -17,15 +17,25 @@ class PlaceSeeder extends Seeder
     public function run(): void
     {
         // Clear existing data
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        DB::table('places')->truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        DB::table('places')->delete();
 
         // Load scraped data
-        $jsonPath = base_path('../flask_api/data/bogor_tourism_data.json');
+        $jsonPath = null;
+        $jsonCandidates = [
+            base_path('database/seeders/data/bogor_tourism_data.json'),
+            base_path('../flask_api/data/bogor_tourism_data.json'),
+            base_path('../script/bogor_tourism_data_clean.json'),
+        ];
 
-        if (!file_exists($jsonPath)) {
-            $this->command->error("Data file not found: {$jsonPath}");
+        foreach ($jsonCandidates as $candidate) {
+            if (file_exists($candidate)) {
+                $jsonPath = $candidate;
+                break;
+            }
+        }
+
+        if ($jsonPath === null) {
+            $this->command->error("Data file not found");
             return;
         }
 
@@ -99,4 +109,3 @@ class PlaceSeeder extends Seeder
         $this->command->info("✅ Imported {$imported} places! Content will be parsed on web display.");
     }
 }
-

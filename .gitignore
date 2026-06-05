@@ -1,0 +1,54 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Laravel
+/web_recommendation/node_modules/
+/web_recommendation/vendor/
+/web_recommendation/storage/*.key
+/web_recommendation/.env
+/web_recommendation/public/hot
+/web_recommendation/public/storage
+/web_recommendation/storage/*.log
+
+# Flask
+/flask_api/*.log
+
+# Models (large files - regenerate from notebooks)
+/dataset/models/indobert-simcse-trained/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+temp_log.txt
+.*
+!.gitignore
+!**/.gitignore
+!**/.dockerignore
+!**/.gitattributes
+!**/.env.example

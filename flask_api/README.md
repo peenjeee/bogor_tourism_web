@@ -85,3 +85,15 @@ flask_api/
 ## 📄 License
 
 Educational Project - BogorXplore 2025
+---
+title: Bogor Xplore Api
+emoji: 🚀
+colorFrom: yellow
+colorTo: purple
+sdk: docker
+pinned: false
+license: mit
+short_description: Flask API for Bogor tourism recommendations
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference

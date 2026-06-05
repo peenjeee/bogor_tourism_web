@@ -160,7 +160,7 @@ def get_recommendations():
 @app.route('/api/search', methods=['GET'])
 def semantic_search():
     """
-    Semantic search using N-Gram + IndoBERT combined similarity.
+    Semantic search using IndoBERT similarity.
     Query params:
         - q: search query string
         - limit: max results (default: None = all results)
@@ -176,6 +176,10 @@ def semantic_search():
             }), 400
         
         results = recommender.semantic_search(query, top_n=limit)
+        if isinstance(results, dict):
+            if results.get('status') != 'success':
+                return jsonify(results), 500
+            results = results.get('data', [])
         
         return jsonify({
             'status': 'success',

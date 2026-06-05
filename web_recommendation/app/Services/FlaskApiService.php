@@ -152,7 +152,7 @@ class FlaskApiService
     }
 
     /**
-     * Semantic search using N-Gram + IndoBERT combined similarity
+     * Semantic search using IndoBERT similarity
      *
      * @param string $query
      * @param int|null $limit

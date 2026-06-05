@@ -26,6 +26,10 @@ class HomeController extends Controller
                 ->get();
         });
 
-        return view('landing', compact('featuredPlaces', 'categories'));
+        $places_count = Cache::remember('places_count', 21600, function () {
+            return Place::count();
+        });
+
+        return view('landing', compact('featuredPlaces', 'categories', 'places_count'));
     }
 }

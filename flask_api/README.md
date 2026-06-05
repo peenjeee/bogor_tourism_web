@@ -1,3 +1,13 @@
+---
+title: Bogor Xplore API
+emoji: 🏞️
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Bogor tourism recommendation API
+---
 # 🤖 Flask API - BogorXplore Recommendation Engine
 
 Flask API untuk menyediakan data wisata dan rekomendasi berbasis Machine Learning menggunakan kombinasi **N-Gram + IndoBERT**.

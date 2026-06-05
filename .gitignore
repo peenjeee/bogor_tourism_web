@@ -46,9 +46,16 @@ Thumbs.db
 *.temp
 *.log
 temp_log.txt
-.*
-!.gitignore
-!**/.gitignore
-!**/.dockerignore
-!**/.gitattributes
+
+# Local tooling
+.omx/
+.sixth/
+.playwright-mcp/
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
 !**/.env.example

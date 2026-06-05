@@ -1,0 +1,59 @@
+name: Sync Flask API to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "flask_api/**"
+      - ".github/workflows/sync-flask-api-to-hf.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-flask-api-to-hf
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull Flask API LFS assets
+        run: |
+          git lfs install
+          git lfs pull --include="flask_api/data/**"
+
+      - name: Prepare Hugging Face Space contents
+        run: |
+          mkdir -p /tmp/hf-space
+          rsync -a --delete --exclude='.git' flask_api/ /tmp/hf-space/
+
+      - name: Push Flask API to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: Peenjeee
+          HF_SPACE: bogor-xplore-api
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "Missing HF_TOKEN secret. Add it in GitHub repository Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          cd /tmp/hf-space
+          git init
+          git checkout -b main
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git lfs install
+          git add .
+          git commit -m "Sync Flask API from GitHub ${GITHUB_SHA}"
+          git remote add hf "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE}"
+          git push --force hf main

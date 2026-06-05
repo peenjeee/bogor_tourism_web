@@ -59,3 +59,4 @@ temp_log.txt
 **/.env.*
 !.env.example
 !**/.env.example
+.deploy/

@@ -1,0 +1,8 @@
+Kategori,Jumlah Data,N-gram+TF-IDF,IndoBERT,N-gram+IndoBERT
+Alam,82,60.98%,64.63%,60.98%
+Arena,82,71.95%,47.56%,71.95%
+Belanja,10,70.00%,20.00%,70.00%
+Kuliner,38,71.05%,50.00%,71.05%
+Olahraga,11,18.18%,0.00%,18.18%
+Rekreasi,62,69.35%,46.77%,69.35%
+Seni Budaya,11,72.73%,27.27%,72.73%

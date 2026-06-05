@@ -1,0 +1,74 @@
+# BogorXplore Robots.txt
+# https://www.robotstxt.org/robotstxt.html
+# Last updated: 2024
+
+# Default rules for all crawlers
+User-agent: *
+Allow: /
+Allow: /places
+Allow: /places/*
+Disallow: /admin/
+Disallow: /api/
+Disallow: /storage/
+Disallow: /vendor/
+Disallow: /_debugbar/
+Disallow: /livewire/
+Disallow: /*.json$
+Disallow: /*?*
+
+# Crawl-delay for bots (to prevent overloading)
+Crawl-delay: 1
+
+# Google Search Bot
+User-agent: Googlebot
+Allow: /
+Allow: /places
+Allow: /places/*
+Crawl-delay: 0
+
+# Google Image Bot
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /storage/
+
+# Bing Bot
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Yahoo Bot
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Baidu Bot
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+# Yandex Bot
+User-agent: Yandex
+Allow: /
+Crawl-delay: 2
+
+# DuckDuckGo Bot
+User-agent: DuckDuckBot
+Allow: /
+
+# Facebook Crawler
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter Bot
+User-agent: Twitterbot
+Allow: /
+
+# LinkedIn Bot
+User-agent: LinkedInBot
+Allow: /
+
+# Sitemaps
+Sitemap: https://bogorxplore.com/sitemap.xml
+
+# Host
+Host: https://bogorxplore.com

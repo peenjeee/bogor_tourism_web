@@ -1,0 +1,375 @@
+/* Theme-aware Professional Design */
+/* Import fonts first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* Import libraries */
+@import 'aos/dist/aos.css';
+@import 'animate.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ==================== DARK MODE (Default) ==================== */
+  body {
+    @apply font-sans min-h-screen antialiased transition-colors duration-300;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background-attachment: fixed;
+    color: #e2e8f0;
+  }
+
+  /* ==================== LIGHT MODE ==================== */
+  body.light-mode {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+    color: #1e293b;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-bold tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-primary-500/30;
+  }
+}
+
+@layer components {
+
+  /* ==================== BUTTONS ==================== */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40 hover:from-primary-600 hover:to-primary-700 transform hover:-translate-y-0.5 transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Secondary Button - Dark Mode */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-md text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transform hover:-translate-y-0.5 transition-all duration-300 ease-out;
+  }
+
+  /* Secondary Button - Light Mode */
+  body.light-mode .btn-secondary {
+    @apply bg-dark-800/10 text-dark-800 border-dark-300 hover:bg-dark-800/20;
+  }
+
+  /* ==================== CARDS ==================== */
+  /* Card - Dark Mode */
+  .card {
+    @apply bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-glass transition-all duration-300 ease-out;
+  }
+
+  /* Card - Light Mode */
+  body.light-mode .card {
+    @apply bg-white border-gray-200 shadow-card;
+  }
+
+  /* Card Hover Effect */
+  .card-hover:hover {
+    @apply border-primary-500/30;
+    animation: pulseSoft 0.3s ease-out;
+  }
+
+  body.light-mode .card-hover:hover {
+    @apply shadow-elevated border-primary-300;
+  }
+
+  /* ==================== TEXT STYLES ==================== */
+  /* Card Title - Dark Mode */
+  .card-title {
+    @apply font-bold text-white;
+  }
+
+  /* Card Title - Light Mode */
+  body.light-mode .card-title {
+    @apply text-dark-800;
+  }
+
+  /* Card Description - Dark Mode */
+  .card-desc {
+    @apply text-gray-300;
+  }
+
+  /* Card Description - Light Mode */
+  body.light-mode .card-desc {
+    @apply text-dark-600;
+  }
+
+  /* Section Heading - Dark Mode */
+  .section-heading {
+    @apply text-white;
+  }
+
+  /* Section Heading - Light Mode */
+  body.light-mode .section-heading {
+    @apply text-dark-800;
+  }
+
+  /* Section Subtitle - Dark Mode */
+  .section-subtitle {
+    @apply text-gray-200;
+  }
+
+  /* Section Subtitle - Light Mode */
+  body.light-mode .section-subtitle {
+    @apply text-dark-600;
+  }
+
+  /* Hero Title - Dark Mode */
+  .hero-title {
+    @apply text-white;
+  }
+
+  body.light-mode .hero-title {
+    @apply text-dark-800;
+  }
+
+  .hero-title-accent {
+    @apply text-primary-400;
+  }
+
+  body.light-mode .hero-title-accent {
+    @apply text-primary-600;
+  }
+
+  /* Hero Description - Dark Mode */
+  .hero-desc {
+    @apply text-gray-300;
+  }
+
+  body.light-mode .hero-desc {
+    @apply text-dark-600;
+  }
+
+  /* ==================== NAVBAR ==================== */
+  /* Navbar - Dark Mode */
+  .navbar-glass {
+    @apply fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/10;
+  }
+
+  /* Navbar - Light Mode */
+  body.light-mode .navbar-glass {
+    @apply bg-white/90 border-gray-200;
+  }
+
+  /* Nav Link - Dark Mode */
+  .nav-link {
+    @apply text-gray-300 hover:text-white transition-colors;
+  }
+
+  /* Nav Link - Light Mode */
+  body.light-mode .nav-link {
+    @apply text-dark-600 hover:text-dark-900;
+  }
+
+  /* Nav Logo Text - Dark Mode */
+  .nav-logo {
+    @apply text-white;
+  }
+
+  /* Nav Logo Text - Light Mode */
+  body.light-mode .nav-logo {
+    @apply text-dark-800;
+  }
+
+  /* ==================== INPUTS ==================== */
+  /* Input - Dark Mode */
+  .input-modern {
+    @apply w-full px-5 py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300;
+  }
+
+  /* Input - Light Mode */
+  body.light-mode .input-modern {
+    @apply bg-white border-2 border-primary-400 text-dark-800 placeholder-gray-500;
+  }
+
+  /* Search Input Inline */
+  .search-input-inline {
+    @apply w-0 opacity-0 px-0 py-2 bg-dark-800 border border-white/10 rounded-lg text-white text-sm transition-all duration-300 ease-out overflow-hidden;
+  }
+
+  body.light-mode .search-input-inline {
+    @apply bg-gray-100 border-gray-300 text-dark-800;
+  }
+
+  .search-container:hover .search-input-inline,
+  .search-container:focus-within .search-input-inline {
+    @apply w-48 md:w-56 opacity-100 px-4;
+  }
+
+  /* ==================== BADGE ==================== */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 bg-primary-500/20 text-primary-300 text-sm font-medium rounded-full border border-primary-500/30;
+  }
+
+  body.light-mode .badge {
+    @apply bg-primary-100 text-primary-700 border-primary-200;
+  }
+
+  /* ==================== STAT ITEM ==================== */
+  .stat-box {
+    @apply bg-white/5 backdrop-blur-md rounded-2xl border border-white/10;
+  }
+
+  body.light-mode .stat-box {
+    @apply bg-white border-gray-200 shadow-card;
+  }
+
+  .stat-number {
+    @apply text-primary-400;
+  }
+
+  body.light-mode .stat-number {
+    @apply text-primary-600;
+  }
+
+  .stat-label {
+    @apply text-gray-400;
+  }
+
+  body.light-mode .stat-label {
+    @apply text-dark-500;
+  }
+
+  /* ==================== IMAGE CONTAINER ==================== */
+  .img-container {
+    @apply relative overflow-hidden rounded-xl;
+  }
+
+  .img-container img {
+    @apply w-full h-full object-cover transition-transform duration-700 ease-out;
+  }
+
+  .img-container:hover img {
+    @apply scale-110;
+  }
+
+  .img-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-dark-900/80 via-dark-900/30 to-transparent;
+  }
+
+  /* ==================== THEME TOGGLE ==================== */
+  .theme-toggle {
+    @apply p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-300;
+  }
+
+  body.light-mode .theme-toggle {
+    @apply bg-dark-100 text-dark-800 hover:bg-dark-200;
+  }
+
+  /* ==================== FOOTER ==================== */
+  .footer-section {
+    @apply bg-dark-950 border-t border-white/5;
+  }
+
+  body.light-mode .footer-section {
+    @apply bg-gray-100 border-gray-200;
+  }
+
+  .footer-text {
+    @apply text-gray-400;
+  }
+
+  body.light-mode .footer-text {
+    @apply text-dark-500;
+  }
+
+  .footer-link {
+    @apply text-gray-400 hover:text-white transition-colors;
+  }
+
+  body.light-mode .footer-link {
+    @apply text-dark-600 hover:text-dark-900;
+  }
+
+  /* ==================== SCROLL INDICATOR ==================== */
+  .scroll-indicator {
+    @apply text-gray-400 hover:text-white transition-colors;
+  }
+
+  body.light-mode .scroll-indicator {
+    @apply text-dark-400 hover:text-dark-800;
+  }
+
+  /* ==================== BACKGROUND ==================== */
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  body.light-mode .bg-grid {
+    background-image:
+      linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  }
+
+  /* Info Box */
+  .info-box {
+    @apply bg-white/5 rounded-lg border border-white/10;
+  }
+
+  body.light-mode .info-box {
+    @apply bg-gray-50 border-gray-200;
+  }
+
+  .info-label {
+    @apply text-gray-400;
+  }
+
+  body.light-mode .info-label {
+    @apply text-dark-500;
+  }
+
+  .info-value {
+    @apply text-white;
+  }
+
+  body.light-mode .info-value {
+    @apply text-dark-800;
+  }
+}
+
+@layer utilities {
+
+  /* Line Clamp */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Scrollbar Hide */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Animate.css keyframes for card hover */
+@keyframes pulseSoft {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

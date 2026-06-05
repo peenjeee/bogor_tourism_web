@@ -8,3 +8,4 @@ Sastrawi
 flask
 flask-cors
 tqdm
+gunicorn

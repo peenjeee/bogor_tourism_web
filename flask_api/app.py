@@ -6,9 +6,11 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Laravel
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Initialize recommender
 print("🚀 Initializing Tourism Recommender...")
-recommender = TourismRecommender(data_path='data/')
+recommender = TourismRecommender(data_path=os.path.join(BASE_DIR, 'data'))
 print("✅ Ready!")
 
 @app.route('/')

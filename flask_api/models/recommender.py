@@ -14,11 +14,13 @@ from transformers import AutoTokenizer, AutoModel
 
 class TourismRecommender:
     """
-    Sistem rekomendasi wisata menggunakan kombinasi N-Gram + IndoBERT
-    Menggunakan kombinasi N-Gram dan IndoBERT (notebook 01-05)
-    
+    Sistem rekomendasi wisata BogorXplore.
+
+    Endpoint aktif:
+    - /api/search memakai IndoBERT untuk pencarian semantik.
+    - /api/recommendations memakai N-Gram + TF-IDF untuk rekomendasi detail wisata.
+
     Data: 296 destinasi wisata Kabupaten Bogor
-    Formula: sim_final = 0.5 × sim_ngram + 0.5 × sim_indobert
     """
     
     def __init__(self, data_path='data/'):
@@ -37,48 +39,40 @@ class TourismRecommender:
         # Load data
         print("   📂 Loading pre-computed data from dataset...")
         self.df = pd.read_csv(data_csv_path)
-        
-        # ========== PERBAIKAN SHAPE MISMATCH (Sync with Notebook V2) ==========
-        # Filter row yang deskripsinya kosong agar shape menjadi 295
+
         if 'deskripsi_clean' in self.df.columns:
-            text_col = 'deskripsi_clean' 
+            text_col = 'deskripsi_clean'
         else:
             text_col = 'deskripsi_ngram'
-            
-        initial_len = len(self.df)
-        mask = self.df[text_col].fillna('').astype(str).str.strip() != ''
-        self.df = self.df[mask].reset_index(drop=True)
-        print(f"   Note: Filtered empty rows. {initial_len} -> {len(self.df)} items.")
-        # ======================================================================
+
+        text_mask = self.df[text_col].fillna('').astype(str).str.strip() != ''
+        self.valid_text_indices = np.flatnonzero(text_mask.to_numpy())
+        empty_count = len(self.df) - len(self.valid_text_indices)
+
+        if empty_count:
+            print(
+                f"   Note: Keeping all {len(self.df)} rows. "
+                f"{empty_count} row(s) with empty text use neutral similarity."
+            )
         
         # Map deskripsi_clean to deskripsi for compatibility
         if 'deskripsi_clean' in self.df.columns and 'deskripsi' not in self.df.columns:
             self.df['deskripsi'] = self.df['deskripsi_clean']
         
         # Load similarity matrices
-        self.ngram_sim = np.load(ngram_similarity_path)
-        self.indobert_sim = np.load(indobert_similarity_path)
+        self.ngram_sim = self._expand_square_matrix(np.load(ngram_similarity_path), 'ngram_similarity')
+        self.indobert_sim = self._expand_square_matrix(np.load(indobert_similarity_path), 'indobert_similarity')
         print(f"   ✅ Loaded ngram_similarity: {self.ngram_sim.shape}")
         print(f"   ✅ Loaded indobert_similarity: {self.indobert_sim.shape}")
         
         # Load TF-IDF untuk query search (if needed)
-        self.tfidf_matrix = np.load(tfidf_matrix_path)
-        # Note: self.tfidf_matrix might be 296 rows (old). If using for search, might mismatch?
-        # Ideally we should use the filtered tfidf matrix, but for now we focus on similarity.
+        self.tfidf_matrix = self._expand_rows(np.load(tfidf_matrix_path), 'tfidf_matrix')
         
         with open(tfidf_vectorizer_path, 'rb') as f:
             self.tfidf_vectorizer = pickle.load(f)
         
         # Load IndoBERT embeddings untuk query search
-        self.indobert_embeddings = np.load(indobert_embeddings_path)
-        # Check shape consistency for IndoBERT embeddings
-        if len(self.df) != len(self.indobert_embeddings):
-             # If embeddings are 295, it's fine. If 296, we might need to filter it too?
-             # For now, we assume embeddings.npy in data folder was already generated from filtered data in notebook?
-             # Notebook 03_indobert_embedding_v2.ipynb generates it.
-             # If notebook saved it, it should match the filtered DF.
-             print(f"   ⚠️ Warning: DF length {len(self.df)} != Embeddings length {len(self.indobert_embeddings)}")
-
+        self.indobert_embeddings = self._expand_rows(np.load(indobert_embeddings_path), 'indobert_embeddings')
         
         # Load IndoBERT model untuk query embedding
         print("   📥 Loading IndoBERT model for query encoding...")
@@ -92,6 +86,47 @@ class TourismRecommender:
         print(f"\n✅ Recommender ready!")
         print(f"   Total destinations: {len(self.df)}")
         print(f"   Method: IndoBERT (Search) & N-Gram (Detail Recommendations)")
+
+    def _expand_square_matrix(self, matrix, name):
+        """Expand compact matrices back to the full destination count."""
+        target_len = len(self.df)
+
+        if matrix.shape == (target_len, target_len):
+            return matrix
+
+        compact_len = len(self.valid_text_indices)
+        if matrix.shape == (compact_len, compact_len):
+            expanded = np.zeros((target_len, target_len), dtype=matrix.dtype)
+            expanded[np.ix_(self.valid_text_indices, self.valid_text_indices)] = matrix
+            np.fill_diagonal(expanded, 1.0)
+            print(f"   ↔️ Expanded {name}: {matrix.shape} -> {expanded.shape}")
+            return expanded
+
+        raise ValueError(
+            f"{name} shape {matrix.shape} does not match "
+            f"full data ({target_len}, {target_len}) or compact data "
+            f"({compact_len}, {compact_len})."
+        )
+
+    def _expand_rows(self, values, name):
+        """Expand row-based artifacts back to the full destination count."""
+        target_len = len(self.df)
+
+        if values.shape[0] == target_len:
+            return values
+
+        compact_len = len(self.valid_text_indices)
+        if values.shape[0] == compact_len:
+            expanded_shape = (target_len, *values.shape[1:])
+            expanded = np.zeros(expanded_shape, dtype=values.dtype)
+            expanded[self.valid_text_indices] = values
+            print(f"   ↔️ Expanded {name}: {values.shape} -> {expanded.shape}")
+            return expanded
+
+        raise ValueError(
+            f"{name} row count {values.shape[0]} does not match "
+            f"full data ({target_len}) or compact data ({compact_len})."
+        )
     
     def _get_query_embedding(self, text):
         """Get IndoBERT embedding for query text (768-dim)"""

@@ -19,11 +19,10 @@ BogorXplore. API ini dipakai oleh aplikasi Laravel di `../web_recommendation`.
 
 - Local development port: `5000`.
 - Docker/Hugging Face Space port: `7860`.
-- Dataset mentah: 296 destinasi dari `data/bogor_tourism_data.csv`.
-- Data rekomendasi efektif: 295 destinasi setelah baris dengan teks kosong
-  difilter saat startup.
+- Dataset mentah dan response API: 296 destinasi dari
+  `data/bogor_tourism_data.csv`.
 - Search memakai IndoBERT similarity/query embedding.
-- Rekomendasi detail memakai precomputed N-Gram similarity.
+- Rekomendasi detail wisata memakai precomputed N-Gram + TF-IDF similarity.
 
 ## Quick Start Lokal
 
@@ -50,7 +49,7 @@ Catatan: startup pertama dapat lebih lama karena model IndoBERT
 | --- | --- | --- |
 | GET | `/` | Health check dan daftar endpoint utama. |
 | GET | `/api/places` | Daftar destinasi dengan pagination dan filter kategori. |
-| GET | `/api/places/<id>` | Detail destinasi berdasarkan index internal API. |
+| GET | `/api/places/id` | Detail destinasi berdasarkan index internal API, contoh `/api/places/1`. |
 | GET | `/api/search?q=<query>` | Pencarian semantik berbasis IndoBERT. |
 | POST | `/api/recommendations` | Rekomendasi destinasi berdasarkan `place_name` atau `place_id`. |
 
@@ -129,7 +128,7 @@ flask_api/
 | `data/ngram_similarity.npy` | Similarity N-Gram precomputed. |
 | `data/indobert_embeddings.npy` | Embedding IndoBERT. |
 | `data/indobert_similarity.npy` | Similarity IndoBERT precomputed. |
-| `data/combined_similarity.npy` | Similarity gabungan dari pipeline notebook. |
+| `data/combined_similarity.npy` | Artefak similarity gabungan dari notebook. |
 
 ## Model Rekomendasi
 
@@ -140,8 +139,8 @@ Data clean
 -> preprocessing
 -> N-Gram + TF-IDF
 -> IndoBERT embedding
--> cosine similarity
--> rekomendasi
+-> cosine similarity per metode
+-> search IndoBERT dan rekomendasi detail N-Gram + TF-IDF
 ```
 
 Implementasi API saat ini:
@@ -149,9 +148,8 @@ Implementasi API saat ini:
 - `/api/search` memakai IndoBERT. Jika query sama persis dengan nama tempat,
   API memakai `indobert_similarity.npy`; jika tidak, query di-encode langsung.
 - `/api/recommendations` mencari tempat dari `place_name` terlebih dahulu,
-  lalu mengambil rekomendasi dari `ngram_similarity.npy`.
-- DataFrame difilter saat startup agar baris dengan `deskripsi_clean` kosong
-  tidak masuk ke index rekomendasi.
+  lalu mengambil rekomendasi detail wisata dari `ngram_similarity.npy`
+  (N-Gram + TF-IDF).
 
 ## Sinkronisasi Artefak
 
@@ -168,7 +166,6 @@ tfidf_vectorizer.pkl
 ngram_similarity.npy
 indobert_embeddings.npy
 indobert_similarity.npy
-combined_similarity.npy
 tabel_perbandingan.csv
 tabel_akurasi_kategori.csv
 ```

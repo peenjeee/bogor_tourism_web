@@ -99,7 +99,7 @@ Endpoint Flask yang dipakai:
 | Method | Endpoint | Fungsi |
 | --- | --- | --- |
 | GET | `/api/places` | Daftar destinasi |
-| GET | `/api/places/<id>` | Detail destinasi |
+| GET | `/api/places/id` | Detail destinasi, contoh `/api/places/1` |
 | GET | `/api/search?q=<query>` | Pencarian semantik |
 | POST | `/api/recommendations` | Rekomendasi destinasi |
 

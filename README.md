@@ -2,8 +2,8 @@
 
 BogorXplore adalah website pariwisata Bogor dengan sistem rekomendasi berbasis
 Machine Learning. Aplikasi web Laravel menampilkan destinasi wisata, sedangkan
-Flask API menyediakan pencarian semantik dan rekomendasi berbasis kombinasi
-N-Gram, IndoBERT, dan cosine similarity.
+Flask API menyediakan pencarian semantik berbasis IndoBERT dan rekomendasi
+detail wisata berbasis N-Gram + TF-IDF.
 
 ## Struktur Project
 
@@ -110,14 +110,14 @@ CREATE DATABASE IF NOT EXISTS jurnal CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 | Daftar wisata | Grid destinasi dengan filter kategori dan pencarian |
 | Detail wisata | Informasi destinasi, gambar, dan rekomendasi terkait |
 | Search semantik | Pencarian dari Flask API berbasis IndoBERT |
-| Rekomendasi ML | Content-based recommendation dari N-Gram + IndoBERT |
+| Rekomendasi detail | Content-based recommendation dari N-Gram + TF-IDF |
 | Responsive UI | Blade, Tailwind CSS, dan interaksi ringan di frontend |
 
 ## Metode Rekomendasi
 
-- N-Gram + TF-IDF untuk kemiripan leksikal.
-- IndoBERT embedding untuk kemiripan semantik.
-- Cosine similarity untuk skor rekomendasi.
+- N-Gram + TF-IDF dipakai untuk rekomendasi di halaman detail wisata.
+- IndoBERT embedding dipakai untuk pencarian semantik.
+- Cosine similarity dipakai untuk menghitung skor kemiripan per metode.
 
 ## API Utama
 
@@ -125,7 +125,7 @@ CREATE DATABASE IF NOT EXISTS jurnal CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 | --- | --- | --- |
 | GET | `/` | Health check |
 | GET | `/api/places` | Daftar destinasi dengan pagination |
-| GET | `/api/places/<id>` | Detail destinasi |
+| GET | `/api/places/id` | Detail destinasi, contoh `/api/places/1` |
 | GET | `/api/search?q=<query>` | Pencarian semantik |
 | POST | `/api/recommendations` | Rekomendasi destinasi |
 

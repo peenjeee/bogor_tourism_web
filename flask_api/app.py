@@ -22,7 +22,8 @@ def index():
         'version': '1.0.0',
         'endpoints': {
             'GET /api/places': 'Get all tourism places with pagination',
-            'GET /api/places/<id>': 'Get specific place details',
+            'GET /api/places/id': 'Get specific place details',
+            'GET /api/search?q=<query>': 'Semantic search using IndoBERT',
             'POST /api/recommendations': 'Get recommendations for a place'
         }
     })

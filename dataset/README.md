@@ -9,7 +9,8 @@ semantik dan rekomendasi destinasi.
 - Total data clean: 296 destinasi wisata.
 - Kategori: Alam, Arena, Belanja, Kuliner, Olahraga, Rekreasi, Seni Budaya.
 - Sumber data clean berasal dari hasil scraping di folder `../script`.
-- Metode rekomendasi: N-Gram + TF-IDF, IndoBERT embedding, cosine similarity,
+- Metode aktif di aplikasi: N-Gram + TF-IDF untuk rekomendasi detail wisata,
+  dan IndoBERT untuk pencarian semantik.
 
 ## Struktur Folder
 
@@ -41,7 +42,7 @@ sebagai versi awal/referensi.
 | 1 | `01_preprocessing_v2.ipynb` | Membersihkan teks dan membuat data preprocessing. |
 | 2 | `02_ngram_extraction_v2.ipynb` | Ekstraksi unigram, bigram, trigram, dan matrix TF-IDF. |
 | 3 | `03_indobert_embedding_v2.ipynb` | Membuat embedding IndoBERT dan similarity semantik. |
-| 4 | `04_recommendation_system_v2.ipynb` | Similarity N-Gram + TF-IDF dan IndoBERT untuk rekomendasi. |
+| 4 | `04_recommendation_system_v2.ipynb` | Similarity N-Gram + TF-IDF untuk rekomendasi detail dan IndoBERT untuk search. |
 | 5 | `05_evaluation_v2.ipynb` | Evaluasi precision, recall, F1-score, dan akurasi kategori. |
 
 ## Alur Data
@@ -49,10 +50,8 @@ sebagai versi awal/referensi.
 ```text
 Data clean
 -> preprocessing teks
--> N-Gram + TF-IDF
--> IndoBERT embedding
--> cosine similarity
--> rekomendasi
+-> N-Gram + TF-IDF similarity untuk rekomendasi detail wisata
+-> IndoBERT embedding dan similarity untuk pencarian semantik
 -> evaluasi
 ```
 
@@ -69,7 +68,7 @@ Data clean
 | `ngram_similarity.npy` | Matrix similarity dari N-Gram + TF-IDF. |
 | `indobert_embeddings.npy` | Embedding IndoBERT untuk seluruh destinasi. |
 | `indobert_similarity.npy` | Matrix similarity dari embedding IndoBERT. |
-| `combined_similarity.npy` | Matrix similarity gabungan untuk rekomendasi akhir. |
+| `combined_similarity.npy` | Matrix similarity gabungan dari eksperimen notebook. |
 | `tabel_perbandingan.csv` | Ringkasan precision, recall, dan F1-score. |
 | `tabel_akurasi_kategori.csv` | Ringkasan akurasi per kategori. |
 | `*.png` | Visualisasi flowchart, distribusi N-Gram, heatmap, dan evaluasi. |
@@ -91,6 +90,8 @@ nama, kategori, url, url_gambar, likes, deskripsi_clean, deskripsi_ngram, unigra
 ## Hasil Evaluasi Singkat
 
 Ringkasan dari `data/tabel_perbandingan.csv`:
+
+Baris `N-Gram + IndoBERT` di tabel ini adalah hasil eksperimen notebook.
 
 | Metode | Top-N | Precision | Recall | F1-Score |
 | --- | ---: | ---: | ---: | ---: |
@@ -120,7 +121,6 @@ tfidf_vectorizer.pkl
 ngram_similarity.npy
 indobert_embeddings.npy
 indobert_similarity.npy
-combined_similarity.npy
 tabel_perbandingan.csv
 tabel_akurasi_kategori.csv
 ```

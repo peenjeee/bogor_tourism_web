@@ -1,72 +1,141 @@
-# 🌐 BogorXplore Web - Laravel Application
+# BogorXplore Web
 
-Laravel-based web application untuk menampilkan destinasi wisata Bogor dengan integrasi sistem rekomendasi ML menggunakan **N-Gram + IndoBERT**.
+Laravel 12 application untuk menampilkan destinasi wisata Bogor, pencarian,
+detail tempat, dan rekomendasi wisata dari Flask ML API.
 
-## 🚀 Features
+## Fitur
 
-- **Landing Page** - Hero section dengan destinasi populer
-- **Places Listing** - Grid view dengan Livewire pagination & filter
-- **Place Detail** - Info lengkap + Google Maps embed + rekomendasi ML
-- **Semantic Search** - Live search menggunakan N-Gram + IndoBERT
-- **Responsive** - Mobile-first design dengan Tailwind CSS
-- **SweetAlert2** - Toast notifications untuk feedback
+- Landing page dengan destinasi populer.
+- Daftar wisata dengan filter kategori dan pencarian.
+- Detail wisata dengan informasi lengkap, gambar, dan rekomendasi N-Gram + TF-IDF.
+- Semantic search melalui Flask API berbasis IndoBERT.
+- Fallback pencarian SQL ketika Flask API tidak aktif.
+- UI responsive dengan Blade, Tailwind CSS, Vite, SweetAlert2, dan AOS.
 
-## 📦 Tech Stack
+## Tech Stack
 
-- Laravel 12 + Livewire 3
+- PHP 8.2+
+- Laravel 12
+- Livewire 3
+- MySQL
 - Tailwind CSS + Vite
-- MySQL Database
-- SweetAlert2 untuk notifikasi
-- AOS untuk animasi scroll
+- Flask API di `../flask_api`
 
-## 🛠️ Installation
+## Setup
 
-```bash
-# Install dependencies
+Jalankan dari folder `web_recommendation`:
+
+```powershell
 composer install
 npm install
-
-# Configure environment
-cp .env.example .env
+Copy-Item .env.example .env
 php artisan key:generate
+```
 
-# Database setup
-php artisan migrate --seed
+Pastikan `.env` memakai MySQL dan Flask API lokal:
 
-# Development
-npm run dev
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bogorxplore
+DB_USERNAME=root
+DB_PASSWORD=
+
+FLASK_API_URL=http://localhost:5000
+FLASK_API_TIMEOUT=30
+```
+
+Buat database jika belum ada:
+
+```sql
+CREATE DATABASE IF NOT EXISTS bogorxplore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Lalu jalankan migration dan seeder:
+
+```powershell
+php artisan migrate
+php artisan db:seed --class=PlaceSeeder
+php artisan optimize:clear
+```
+
+## Menjalankan Aplikasi
+
+Terminal 1, dari root repo:
+
+```powershell
+cd flask_api
+python app.py
+```
+
+Terminal 2, dari folder `web_recommendation`:
+
+```powershell
 php artisan serve
 ```
 
-## 📁 Struktur Penting
+Terminal 3, dari folder `web_recommendation`:
 
+```powershell
+npm run dev
 ```
+
+Akses aplikasi di `http://localhost:8000`.
+
+## Integrasi Flask API
+
+Laravel membaca URL API dari `config/services.php`:
+
+```php
+'flask' => [
+    'base_url' => env('FLASK_API_URL', 'http://localhost:5000'),
+    'timeout' => env('FLASK_API_TIMEOUT', 30),
+],
+```
+
+Endpoint Flask yang dipakai:
+
+| Method | Endpoint | Fungsi |
+| --- | --- | --- |
+| GET | `/api/places` | Daftar destinasi |
+| GET | `/api/places/<id>` | Detail destinasi |
+| GET | `/api/search?q=<query>` | Pencarian semantik |
+| POST | `/api/recommendations` | Rekomendasi destinasi |
+
+## Struktur Penting
+
+```text
 web_recommendation/
 ├── app/
-│   ├── Http/Controllers/PlaceController.php
+│   ├── Http/Controllers/
+│   │   ├── HomeController.php
+│   │   ├── PlaceController.php
+│   │   └── FlaskProxyController.php
 │   ├── Livewire/PlacesList.php
 │   ├── Models/Place.php
 │   └── Services/FlaskApiService.php
+├── database/
+│   ├── migrations/
+│   └── seeders/PlaceSeeder.php
 ├── resources/views/
 │   ├── landing.blade.php
 │   ├── layouts/app.blade.php
 │   ├── livewire/places-list.blade.php
 │   └── places/show.blade.php
-└── .env (FLASK_API_URL=http://localhost:5000)
+└── routes/web.php
 ```
 
-## 🔗 API Integration
+## Troubleshooting
 
-Aplikasi ini terhubung ke Flask API untuk mendapatkan rekomendasi ML.
+| Masalah | Solusi |
+| --- | --- |
+| Database connection error | Pastikan MySQL aktif dan `DB_*` di `.env` benar |
+| Tabel `places` kosong | Jalankan `php artisan db:seed --class=PlaceSeeder` |
+| Rekomendasi tidak muncul | Jalankan Flask API: `cd ../flask_api; python app.py` |
+| CSS/JS tidak update | Jalankan `npm run dev` |
+| Cache config bermasalah | Jalankan `php artisan optimize:clear` |
 
-```env
-FLASK_API_URL=http://localhost:5000
-```
+## Lisensi
 
-**Metode Rekomendasi:**
-- Semantic Search menggunakan N-Gram + IndoBERT
-- 296 destinasi wisata dalam 7 kategori
-
-## 📄 License
-
-Educational Project - BogorXplore 2025
+Educational Project - BogorXplore.

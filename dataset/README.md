@@ -1,37 +1,133 @@
-# Dataset - Sistem Rekomendasi Wisata Bogor
+# Dataset dan Notebook ML BogorXplore
 
-## Ekstraksi Kata Kunci dengan N-Gram dan IndoBERT untuk Rekomendasi Wisata Bogor
+Folder ini berisi notebook eksperimen Machine Learning untuk sistem rekomendasi
+wisata Bogor. Artefak yang dihasilkan dipakai oleh Flask API untuk pencarian
+semantik dan rekomendasi destinasi.
 
-Folder ini berisi notebook Jupyter untuk preprocessing data dan pengembangan sistem rekomendasi wisata.
+## Ringkasan Dataset
 
-### 📊 Dataset
-- **296 destinasi wisata** Kabupaten Bogor
-- **7 kategori:** Arena, Olahraga, Alam, Seni Budaya, Belanja, Kuliner, Rekreasi
-- Data dikumpulkan melalui web scraping dari Google Maps
+- Total data clean: 296 destinasi wisata.
+- Kategori: Alam, Arena, Belanja, Kuliner, Olahraga, Rekreasi, Seni Budaya.
+- Sumber data clean berasal dari hasil scraping di folder `../script`.
+- Metode rekomendasi: N-Gram + TF-IDF, IndoBERT embedding, cosine similarity,
 
-### 📁 Struktur File
+## Struktur Folder
 
-| No | File | Deskripsi |
-|----|------|-----------|
-| 0 | `00_generate_flowchart.ipynb` | Generate flowchart metodologi |
-| 1 | `01_preprocessing.ipynb` | Preprocessing data (case folding, cleaning) |
-| 2 | `02_ngram_extraction.ipynb` | Ekstraksi kata kunci dengan N-gram + TF-IDF |
-| 3 | `03_indobert_embedding.ipynb` | Generate embedding IndoBERT |
-| 4 | `04_recommendation_system.ipynb` | Sistem rekomendasi (N-gram + IndoBERT 50:50) |
-| 5 | `05_evaluation.ipynb` | Evaluasi (Precision, Recall, F1-Score) |
-
-### 🔄 Flow
-
+```text
+dataset/
+├── checkpoints/            # checkpoint/cache model lokal
+├── data/                   # hasil preprocessing, matrix, similarity, dan grafik
+├── models/                 # ruang simpan model tambahan jika diperlukan
+├── 01_preprocessing_v2.ipynb
+├── 01_preprocessing.ipynb
+├── 02_ngram_extraction_v2.ipynb
+├── 02_ngram_extraction.ipynb
+├── 03_indobert_embedding_v2.ipynb
+├── 03_indobert_embedding.ipynb
+├── 04_recommendation_system_v2.ipynb
+├── 04_recommendation_system.ipynb
+├── 05_evaluation_v2.ipynb
+├── 05_evaluation.ipynb
+└── README.md
 ```
-Preprocessing → N-gram (TF-IDF) → IndoBERT (Embedding) → Cosine Similarity → Recommendation → Evaluation
+
+## Urutan Notebook
+
+Gunakan notebook `_v2` sebagai alur terbaru. Notebook tanpa `_v2` disimpan
+sebagai versi awal/referensi.
+
+| Urutan | Notebook | Fungsi |
+| --- | --- | --- |
+| 1 | `01_preprocessing_v2.ipynb` | Membersihkan teks dan membuat data preprocessing. |
+| 2 | `02_ngram_extraction_v2.ipynb` | Ekstraksi unigram, bigram, trigram, dan matrix TF-IDF. |
+| 3 | `03_indobert_embedding_v2.ipynb` | Membuat embedding IndoBERT dan similarity semantik. |
+| 4 | `04_recommendation_system_v2.ipynb` | Similarity N-Gram + TF-IDF dan IndoBERT untuk rekomendasi. |
+| 5 | `05_evaluation_v2.ipynb` | Evaluasi precision, recall, F1-score, dan akurasi kategori. |
+
+## Alur Data
+
+```text
+Data clean
+-> preprocessing teks
+-> N-Gram + TF-IDF
+-> IndoBERT embedding
+-> cosine similarity
+-> rekomendasi
+-> evaluasi
 ```
 
-### 📂 Folder Data
+## File Penting di `data/`
 
-| File | Deskripsi |
-|------|-----------|
-| `data_preprocessed.csv` | Data hasil preprocessing |
-| `tfidf_matrix.npy` | Matriks TF-IDF (296 × 5000) |
-| `tfidf_vectorizer.pkl` | TF-IDF Vectorizer model |
-| `indobert_embeddings.npy` | IndoBERT embeddings (296 × 768) |
-| `combined_similarity.npy` | Matriks similarity gabungan (296 × 296) |
+| File | Fungsi |
+| --- | --- |
+| `data_preprocessed.csv` | Data utama setelah preprocessing, berisi 296 baris. |
+| `data_preprocessed_ngram.csv` | Data preprocessing khusus ekstraksi N-Gram. |
+| `data_preprocessed_indobert.csv` | Data preprocessing khusus embedding IndoBERT. |
+| `data_with_keywords.csv` | Data destinasi dengan kolom unigram, bigram, dan trigram. |
+| `tfidf_matrix.npy` | Matrix TF-IDF untuk fitur N-Gram. |
+| `tfidf_vectorizer.pkl` | Model/vectorizer TF-IDF. |
+| `ngram_similarity.npy` | Matrix similarity dari N-Gram + TF-IDF. |
+| `indobert_embeddings.npy` | Embedding IndoBERT untuk seluruh destinasi. |
+| `indobert_similarity.npy` | Matrix similarity dari embedding IndoBERT. |
+| `combined_similarity.npy` | Matrix similarity gabungan untuk rekomendasi akhir. |
+| `tabel_perbandingan.csv` | Ringkasan precision, recall, dan F1-score. |
+| `tabel_akurasi_kategori.csv` | Ringkasan akurasi per kategori. |
+| `*.png` | Visualisasi flowchart, distribusi N-Gram, heatmap, dan evaluasi. |
+
+## Kolom Data Utama
+
+`data_preprocessed.csv` berisi:
+
+```text
+nama, kategori, url, url_gambar, likes, isi, deskripsi, deskripsi_clean, deskripsi_ngram
+```
+
+`data_with_keywords.csv` berisi:
+
+```text
+nama, kategori, url, url_gambar, likes, deskripsi_clean, deskripsi_ngram, unigrams, bigrams, trigrams
+```
+
+## Hasil Evaluasi Singkat
+
+Ringkasan dari `data/tabel_perbandingan.csv`:
+
+| Metode | Top-N | Precision | Recall | F1-Score |
+| --- | ---: | ---: | ---: | ---: |
+| N-Gram + TF-IDF | 3 | 0.6340 | 0.0406 | 0.0723 |
+| IndoBERT | 3 | 0.4550 | 0.0242 | 0.0445 |
+| N-Gram + IndoBERT | 3 | 0.6340 | 0.0406 | 0.0723 |
+| N-Gram + TF-IDF | 5 | 0.6074 | 0.0614 | 0.1040 |
+| IndoBERT | 5 | 0.4236 | 0.0369 | 0.0649 |
+| N-Gram + IndoBERT | 5 | 0.6081 | 0.0615 | 0.1041 |
+| N-Gram + TF-IDF | 10 | 0.5764 | 0.1100 | 0.1697 |
+| IndoBERT | 10 | 0.3892 | 0.0655 | 0.1060 |
+| N-Gram + IndoBERT | 10 | 0.5760 | 0.1100 | 0.1696 |
+
+## Sinkronisasi ke Flask API
+
+Flask API membaca artefak dari `../flask_api/data`, bukan langsung dari
+`dataset/data`. Setelah notebook menghasilkan artefak baru, salin file yang
+dibutuhkan ke `flask_api/data` agar API memakai versi terbaru.
+
+File yang biasanya perlu disinkronkan:
+
+```text
+data_preprocessed.csv
+data_with_keywords.csv
+tfidf_matrix.npy
+tfidf_vectorizer.pkl
+ngram_similarity.npy
+indobert_embeddings.npy
+indobert_similarity.npy
+combined_similarity.npy
+tabel_perbandingan.csv
+tabel_akurasi_kategori.csv
+```
+
+## Catatan
+
+- Jalankan notebook berurutan karena output satu tahap dipakai tahap berikutnya.
+- Hindari menghapus file `.npy` dan `.pkl` jika Flask API masih membutuhkannya.
+- Jika dataset dari `../script` di-regenerate, ulangi pipeline notebook dan
+  sinkronkan artefak ke `flask_api/data`.

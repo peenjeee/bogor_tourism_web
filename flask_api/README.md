@@ -6,104 +6,230 @@ colorTo: blue
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Bogor tourism recommendation API
----
-# 🤖 Flask API - BogorXplore Recommendation Engine
-
-Flask API untuk menyediakan data wisata dan rekomendasi berbasis Machine Learning menggunakan kombinasi **N-Gram + IndoBERT**.
-
-## 🚀 Quick Start
-
-```bash
-cd flask_api
-pip install -r requirements.txt
-python app.py
-# API runs on http://localhost:5000
-```
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| GET | `/` | Health check |
-| GET | `/api/places` | Get all places (paginated) |
-| GET | `/api/places/<id>` | Get place detail |
-| GET | `/api/search?q=<query>` | Semantic search |
-| POST | `/api/recommendations` | Get ML recommendations |
-
-### Semantic Search
-```
-GET /api/search?q=air terjun&limit=10
-```
-
-### Get All Places
-```
-GET /api/places?limit=20&offset=0&category=Alam
-```
-
-### Get Recommendations
-```
-POST /api/recommendations
-Content-Type: application/json
-
-{
-    "place_id": 1,
-    "top_n": 10
-}
-```
-
-## 🧠 ML Model
-
-**Content-Based Filtering dengan N-Gram + IndoBERT:**
-
-| Komponen | Deskripsi |
-|----------|-----------|
-| **N-Gram** | Unigram, Bigram, Trigram + TF-IDF (5000 features) |
-| **IndoBERT** | Sentence embedding 768 dimensi |
-| **Similarity** | Cosine Similarity |
-| **Formula** | `sim_final = 0.5 × sim_ngram + 0.5 × sim_indobert` |
-
-## 📁 Struktur
-
-```
-flask_api/
-├── app.py              # Main Flask application
-├── models/
-│   ├── __init__.py
-│   ├── recommender.py  # ML recommendation engine
-│   └── preprocessor.py # Text preprocessing
-├── data/
-│   ├── bogor_tourism_data.csv
-│   ├── data_preprocessed.csv
-│   ├── combined_similarity.npy
-│   ├── tfidf_matrix.npy
-│   ├── tfidf_vectorizer.pkl
-│   └── indobert_embeddings.npy
-└── requirements.txt
-```
-
-## 📦 Dependencies
-
-- Flask 3.0
-- Pandas, NumPy
-- Scikit-learn
-- Transformers (IndoBERT)
-- PyTorch
-- Sastrawi
-- Flask-CORS
-
-## 📄 License
-
-Educational Project - BogorXplore 2025
----
-title: Bogor Xplore Api
-emoji: 🚀
-colorFrom: yellow
-colorTo: purple
-sdk: docker
-pinned: false
 license: mit
 short_description: Flask API for Bogor tourism recommendations
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+# BogorXplore Flask API
+
+Flask API untuk data wisata, pencarian semantik, dan rekomendasi destinasi
+BogorXplore. API ini dipakai oleh aplikasi Laravel di `../web_recommendation`.
+
+## Ringkasan
+
+- Local development port: `5000`.
+- Docker/Hugging Face Space port: `7860`.
+- Dataset mentah: 296 destinasi dari `data/bogor_tourism_data.csv`.
+- Data rekomendasi efektif: 295 destinasi setelah baris dengan teks kosong
+  difilter saat startup.
+- Search memakai IndoBERT similarity/query embedding.
+- Rekomendasi detail memakai precomputed N-Gram similarity.
+
+## Quick Start Lokal
+
+Dari root repo:
+
+```powershell
+cd flask_api
+pip install -r requirements.txt
+python app.py
+```
+
+API berjalan di:
+
+```text
+http://localhost:5000
+```
+
+Catatan: startup pertama dapat lebih lama karena model IndoBERT
+`indobenchmark/indobert-base-p1` dimuat oleh Transformers.
+
+## Endpoint
+
+| Method | Endpoint | Fungsi |
+| --- | --- | --- |
+| GET | `/` | Health check dan daftar endpoint utama. |
+| GET | `/api/places` | Daftar destinasi dengan pagination dan filter kategori. |
+| GET | `/api/places/<id>` | Detail destinasi berdasarkan index internal API. |
+| GET | `/api/search?q=<query>` | Pencarian semantik berbasis IndoBERT. |
+| POST | `/api/recommendations` | Rekomendasi destinasi berdasarkan `place_name` atau `place_id`. |
+
+## Contoh Request
+
+Health check:
+
+```powershell
+curl http://localhost:5000/
+```
+
+Daftar destinasi:
+
+```powershell
+curl "http://localhost:5000/api/places?limit=20&offset=0&category=Alam"
+```
+
+Pencarian semantik:
+
+```powershell
+curl "http://localhost:5000/api/search?q=air%20terjun&limit=10"
+```
+
+Rekomendasi:
+
+```powershell
+curl -X POST "http://localhost:5000/api/recommendations" `
+  -H "Content-Type: application/json" `
+  -d "{\"place_name\":\"Curug Ciampea\",\"top_n\":5}"
+```
+
+Payload rekomendasi:
+
+```json
+{
+  "place_name": "Curug Ciampea",
+  "top_n": 5
+}
+```
+
+`place_name` lebih aman dipakai dari Laravel karena `place_id` adalah index
+internal data API, bukan primary key database MySQL Laravel.
+
+## Struktur
+
+```text
+flask_api/
+├── api/                    # ruang tambahan untuk modul API jika diperlukan
+├── data/                   # dataset dan artefak ML precomputed
+├── models/
+│   ├── __init__.py
+│   ├── preprocessor.py
+│   └── recommender.py
+├── .dockerignore
+├── .gitattributes
+├── .python-version
+├── app.py
+├── Dockerfile
+├── README.md
+├── reproduce_error.py
+├── requirements.txt
+├── test_api.py
+└── test_search.py
+```
+
+## File Data Penting
+
+| File | Fungsi |
+| --- | --- |
+| `data/bogor_tourism_data.csv` | Dataset clean mentah, 296 destinasi. |
+| `data/bogor_tourism_data.json` | Dataset clean dalam format JSON. |
+| `data/data_preprocessed.csv` | Data hasil preprocessing notebook. |
+| `data/data_with_keywords.csv` | Data dengan unigram, bigram, dan trigram; dipakai recommender. |
+| `data/tfidf_matrix.npy` | Matrix TF-IDF. |
+| `data/tfidf_vectorizer.pkl` | Vectorizer TF-IDF untuk query/search. |
+| `data/ngram_similarity.npy` | Similarity N-Gram precomputed. |
+| `data/indobert_embeddings.npy` | Embedding IndoBERT. |
+| `data/indobert_similarity.npy` | Similarity IndoBERT precomputed. |
+| `data/combined_similarity.npy` | Similarity gabungan dari pipeline notebook. |
+
+## Model Rekomendasi
+
+Pipeline ML utama dikembangkan di `../dataset`:
+
+```text
+Data clean
+-> preprocessing
+-> N-Gram + TF-IDF
+-> IndoBERT embedding
+-> cosine similarity
+-> rekomendasi
+```
+
+Implementasi API saat ini:
+
+- `/api/search` memakai IndoBERT. Jika query sama persis dengan nama tempat,
+  API memakai `indobert_similarity.npy`; jika tidak, query di-encode langsung.
+- `/api/recommendations` mencari tempat dari `place_name` terlebih dahulu,
+  lalu mengambil rekomendasi dari `ngram_similarity.npy`.
+- DataFrame difilter saat startup agar baris dengan `deskripsi_clean` kosong
+  tidak masuk ke index rekomendasi.
+
+## Sinkronisasi Artefak
+
+Jika notebook di `../dataset` menghasilkan artefak baru, salin file yang
+dibutuhkan ke `flask_api/data` sebelum menjalankan API atau deploy ulang.
+
+File yang biasanya disinkronkan:
+
+```text
+data_preprocessed.csv
+data_with_keywords.csv
+tfidf_matrix.npy
+tfidf_vectorizer.pkl
+ngram_similarity.npy
+indobert_embeddings.npy
+indobert_similarity.npy
+combined_similarity.npy
+tabel_perbandingan.csv
+tabel_akurasi_kategori.csv
+```
+
+## Docker dan Hugging Face Space
+
+Build lokal dari folder `flask_api`:
+
+```powershell
+docker build -t bogor-xplore-api .
+docker run --rm -p 7860:7860 bogor-xplore-api
+```
+
+Docker menjalankan:
+
+```text
+gunicorn --bind 0.0.0.0:7860 --timeout 300 app:app
+```
+
+File `.github/workflows/sync-flask-api-to-hf.yml` melakukan sync folder
+`flask_api/` ke Hugging Face Space saat ada push ke branch `main` yang mengubah
+folder ini atau workflow tersebut. Workflow membutuhkan secret `HF_TOKEN`.
+
+## Test Manual
+
+Jalankan API dulu, lalu:
+
+```powershell
+python test_api.py
+python test_search.py
+```
+
+`test_api.py` memanggil endpoint rekomendasi, sedangkan `test_search.py`
+memanggil endpoint pencarian semantik.
+
+## Dependencies
+
+Daftar lengkap ada di `requirements.txt`.
+
+Paket utama:
+
+- Flask
+- Flask-CORS
+- Pandas
+- NumPy
+- scikit-learn
+- Transformers
+- PyTorch
+- Sastrawi
+- Gunicorn
+
+## Troubleshooting
+
+| Masalah | Solusi |
+| --- | --- |
+| API lama saat startup | Tunggu model IndoBERT selesai dimuat. |
+| `ModuleNotFoundError` | Jalankan `pip install -r requirements.txt`. |
+| File `.npy` atau `.pkl` tidak ditemukan | Sinkronkan artefak dari `../dataset/data` ke `flask_api/data`. |
+| Rekomendasi tidak sesuai tempat Laravel | Kirim `place_name` selain `place_id` dari Laravel. |
+| Deploy Hugging Face gagal | Pastikan `HF_TOKEN` ada dan Git LFS asset `flask_api/data/**` ikut ter-pull. |
+
+## Lisensi
+
+Educational Project - BogorXplore.

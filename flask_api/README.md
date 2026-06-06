@@ -50,7 +50,7 @@ Catatan: startup pertama dapat lebih lama karena model IndoBERT
 | GET | `/` | Health check dan daftar endpoint utama. |
 | GET | `/api/places` | Daftar destinasi dengan pagination dan filter kategori. |
 | GET | `/api/places/id` | Detail destinasi berdasarkan index internal API, contoh `/api/places/1`. |
-| GET | `/api/search?q=<query>` | Pencarian semantik berbasis IndoBERT. |
+| GET | `/api/search?q=query` | Pencarian semantik berbasis IndoBERT. |
 | POST | `/api/recommendations` | Rekomendasi destinasi berdasarkan `place_name` atau `place_id`. |
 
 ## Contoh Request

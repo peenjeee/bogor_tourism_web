@@ -100,7 +100,7 @@ Endpoint Flask yang dipakai:
 | --- | --- | --- |
 | GET | `/api/places` | Daftar destinasi |
 | GET | `/api/places/id` | Detail destinasi, contoh `/api/places/1` |
-| GET | `/api/search?q=<query>` | Pencarian semantik |
+| GET | `/api/search?q=query` | Pencarian semantik |
 | POST | `/api/recommendations` | Rekomendasi destinasi |
 
 ## Struktur Penting

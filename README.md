@@ -126,7 +126,7 @@ CREATE DATABASE IF NOT EXISTS jurnal CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 | GET | `/` | Health check |
 | GET | `/api/places` | Daftar destinasi dengan pagination |
 | GET | `/api/places/id` | Detail destinasi, contoh `/api/places/1` |
-| GET | `/api/search?q=<query>` | Pencarian semantik |
+| GET | `/api/search?q=query` | Pencarian semantik |
 | POST | `/api/recommendations` | Rekomendasi destinasi |
 
 ## Tech Stack

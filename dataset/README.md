@@ -35,7 +35,7 @@ dataset/
 ## Urutan Notebook
 
 Gunakan notebook `_v2` sebagai alur terbaru. Notebook tanpa `_v2` disimpan
-sebagai versi awal/referensi.
+sebagai versi awal/artifact.
 
 | Urutan | Notebook | Fungsi |
 | --- | --- | --- |

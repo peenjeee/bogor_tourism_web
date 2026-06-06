@@ -103,7 +103,7 @@
                 <!-- Description -->
                 <p class="text-sm sm:text-base md:text-lg hero-desc mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed font-semibold"
                     data-aos="fade-up">
-                    Temukan <span class="hero-title-accent">{{ $places_count ?? '297' }}+</span> rekomendasi destinasi
+                    Temukan <span class="hero-title-accent">{{ $places_count ?? '296' }}</span> rekomendasi destinasi
                     wisata menakjubkan di Bogor</span>
                 </p>
 
@@ -130,7 +130,7 @@
                 <!-- Stats -->
                 <div class="mt-10 md:mt-14" data-aos="zoom-in">
                     <div class="inline-block stat-box text-center px-8 md:px-12 py-4 md:py-6">
-                        <div class="text-3xl md:text-5xl font-bold stat-number mb-1">{{ $places_count ?? '297' }}+</div>
+                        <div class="text-3xl md:text-5xl font-bold stat-number mb-1">{{ $places_count ?? '296' }}</div>
                         <div class="text-xs md:text-sm uppercase tracking-wider stat-label">Destinasi Wisata</div>
                     </div>
                 </div>

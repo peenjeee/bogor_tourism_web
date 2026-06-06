@@ -19,35 +19,19 @@ class PlaceSeeder extends Seeder
         // Clear existing data and reset IDs from 1.
         DB::table('places')->truncate();
 
-        // Load scraped data
-        $jsonPath = null;
-        $jsonCandidates = [
-            base_path('database/seeders/data/bogor_tourism_data.json'),
-            base_path('../flask_api/data/bogor_tourism_data.json'),
-            base_path('../script/bogor_tourism_data_clean.json'),
-        ];
+        [$jsonData, $sourcePath] = $this->loadTourismData();
 
-        foreach ($jsonCandidates as $candidate) {
-            if (file_exists($candidate)) {
-                $jsonPath = $candidate;
-                break;
-            }
-        }
-
-        if ($jsonPath === null) {
+        if ($sourcePath === null) {
             $this->command->error("Data file not found");
             return;
         }
 
-        $this->command->info("Loading data from: {$jsonPath}");
-
-        $jsonData = json_decode(file_get_contents($jsonPath), true);
-
-        if (!$jsonData) {
-            $this->command->error("Failed to parse JSON data");
+        if (empty($jsonData)) {
+            $this->command->error("Failed to parse tourism data");
             return;
         }
 
+        $this->command->info("Loading data from: {$sourcePath}");
         $this->command->info("Found " . count($jsonData) . " scraped destinations");
 
         $cleanData = [];
@@ -124,10 +108,108 @@ class PlaceSeeder extends Seeder
                 ]);
                 $imported++;
             } catch (\Exception $e) {
-                // Skip silently
+                $this->command->warn("Skipped {$nama}: {$e->getMessage()}");
             }
         }
 
-        $this->command->info("✅ Imported {$imported} places! Content will be parsed on web display.");
+        $this->command->info("Imported {$imported} places. Content will be parsed on web display.");
+    }
+
+    /**
+     * Load the 296-place dataset. CSV is preferred because the generated JSON
+     * can contain JavaScript-style NaN values, which are invalid JSON in PHP.
+     */
+    private function loadTourismData(): array
+    {
+        $csvCandidates = [
+            base_path('../script/bogor_tourism_data_clean.csv'),
+            base_path('../flask_api/data/bogor_tourism_data.csv'),
+            base_path('database/seeders/data/bogor_tourism_data.csv'),
+        ];
+
+        foreach ($csvCandidates as $candidate) {
+            if (!file_exists($candidate)) {
+                continue;
+            }
+
+            $data = $this->loadCsvData($candidate);
+
+            if (!empty($data)) {
+                return [$data, $candidate];
+            }
+        }
+
+        $jsonCandidates = [
+            base_path('database/seeders/data/bogor_tourism_data.json'),
+            base_path('../flask_api/data/bogor_tourism_data.json'),
+            base_path('../script/bogor_tourism_data_clean.json'),
+        ];
+
+        foreach ($jsonCandidates as $candidate) {
+            if (!file_exists($candidate)) {
+                continue;
+            }
+
+            $data = $this->loadJsonData($candidate);
+
+            if (!empty($data)) {
+                return [$data, $candidate];
+            }
+        }
+
+        return [[], null];
+    }
+
+    private function loadCsvData(string $path): array
+    {
+        $handle = fopen($path, 'r');
+
+        if ($handle === false) {
+            return [];
+        }
+
+        $header = fgetcsv($handle);
+
+        if ($header === false) {
+            fclose($handle);
+            return [];
+        }
+
+        $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]);
+        $header = array_map('trim', $header);
+        $data = [];
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if ($row === [null]) {
+                continue;
+            }
+
+            $row = array_pad($row, count($header), null);
+            $data[] = array_combine($header, array_slice($row, 0, count($header)));
+        }
+
+        fclose($handle);
+
+        return $data;
+    }
+
+    private function loadJsonData(string $path): array
+    {
+        $contents = file_get_contents($path);
+
+        if ($contents === false) {
+            return [];
+        }
+
+        $data = json_decode($contents, true);
+
+        if (is_array($data)) {
+            return $data;
+        }
+
+        $contents = preg_replace('/:\s*NaN\b/', ': null', $contents);
+        $data = json_decode($contents, true);
+
+        return is_array($data) ? $data : [];
     }
 }

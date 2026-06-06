@@ -99,7 +99,7 @@ FLASK_API_TIMEOUT=30
 Buat database sebelum migration jika belum ada:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS jurnal CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS bogorxplore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ## Fitur

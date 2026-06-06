@@ -78,7 +78,7 @@ FLASK_API_TIMEOUT=30
 Pastikan database sudah ada:
 
 ```sql
-CREATE DATABASE IF NOT EXISTS jurnal CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS bogorxplore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 Lalu jalankan database setup dari folder `web_recommendation`:

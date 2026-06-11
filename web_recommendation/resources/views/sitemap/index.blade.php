@@ -19,6 +19,14 @@
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
+
+    <!-- Location Recommendations Page -->
+    <url>
+        <loc>{{ url('/recommendations') }}</loc>
+        <lastmod>{{ date('Y-m-d') }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
     
     <!-- Individual Places with Images -->
     @foreach($places as $place)

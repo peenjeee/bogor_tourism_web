@@ -154,6 +154,23 @@
     @apply fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-xl border-b border-white/10;
   }
 
+  @media (max-width: 767px) {
+    body.mobile-menu-open {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    body.mobile-menu-open .navbar-glass {
+      min-height: 100dvh;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    #mobile-menu {
+      background: rgba(15, 23, 42, 0.98);
+    }
+  }
+
   /* Navbar - Light Mode */
   body.light-mode .navbar-glass {
     @apply bg-white/90 border-gray-200;

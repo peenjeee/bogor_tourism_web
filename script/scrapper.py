@@ -114,7 +114,7 @@ class BogorTourismScraper:
             response.raise_for_status()
             return BeautifulSoup(response.text, 'html.parser')
         except requests.RequestException as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return None
     
     def _extract_section_content(self, soup: BeautifulSoup, section_names: List[str]) -> str:
@@ -257,7 +257,7 @@ class BogorTourismScraper:
             return result
             
         except Exception as e:
-            print(f"⚠️ Error detail: {e}")
+            print(f"Error detail: {e}")
             return result
     
     def _extract_items_from_page(self, soup: BeautifulSoup, kategori: str) -> List[TourismItem]:
@@ -343,11 +343,11 @@ class BogorTourismScraper:
     def scrape_category(self, kategori: str, max_pages: int = None) -> List[TourismItem]:
         kategori_lower = kategori.lower().replace(' ', '-')
         if kategori_lower not in CATEGORIES:
-            print(f"❌ Kategori '{kategori}' tidak ditemukan.")
+            print(f"Kategori '{kategori}' tidak ditemukan.")
             return []
         
         all_items = []
-        print(f"\n📂 Scraping: {kategori}")
+        print(f"\nScraping: {kategori}")
         
         first_url = f"{BASE_URL}/category/{kategori_lower}/"
         soup = self._get_page(first_url)
@@ -357,11 +357,11 @@ class BogorTourismScraper:
         actual_max = self._get_max_pages(soup)
         if max_pages:
             actual_max = min(actual_max, max_pages)
-        print(f"   📄 Halaman: {actual_max}")
+        print(f"   Halaman: {actual_max}")
         
         items = self._extract_items_from_page(soup, kategori)
         all_items.extend(items)
-        print(f"   ✓ Page 1: {len(items)} items")
+        print(f"   Page 1: {len(items)} items")
         
         for page in range(2, actual_max + 1):
             time.sleep(self.delay)
@@ -373,11 +373,11 @@ class BogorTourismScraper:
             if not items:
                 break
             all_items.extend(items)
-            print(f"   ✓ Page {page}: {len(items)} items")
+            print(f"   Page {page}: {len(items)} items")
         
         # Ambil detail dari setiap halaman
         if self.scrape_details and all_items:
-            print(f"   📝 Mengambil detail...")
+            print(f"   Mengambil detail...")
             for i, item in enumerate(all_items):
                 time.sleep(self.delay * 0.5)
                 detail = self._get_detail_data(item.url)
@@ -393,13 +393,13 @@ class BogorTourismScraper:
                 if (i + 1) % 10 == 0:
                     print(f"      {i + 1}/{len(all_items)}")
         
-        print(f"   ✅ Total: {len(all_items)}")
+        print(f"   Total: {len(all_items)}")
         return all_items
     
     def scrape_all_categories(self, max_pages_per_category: int = None) -> List[TourismItem]:
         all_items = []
         print("=" * 50)
-        print("🌴 BOGOR TOURISM SCRAPER (UPDATED)")
+        print("BOGOR TOURISM SCRAPER (UPDATED)")
         print("=" * 50)
         
         for kategori in CATEGORIES:
@@ -408,7 +408,7 @@ class BogorTourismScraper:
             time.sleep(self.delay)
         
         print("\n" + "=" * 50)
-        print(f"🎉 TOTAL: {len(all_items)} items")
+        print(f"TOTAL: {len(all_items)} items")
         print("=" * 50)
         return all_items
     
@@ -418,18 +418,18 @@ class BogorTourismScraper:
     def save_to_csv(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.csv"):
         df = self.to_dataframe(items)
         df.to_csv(filename, index=False, encoding='utf-8-sig')
-        print(f"💾 Saved: {filename}")
+        print(f"Saved: {filename}")
     
     def save_to_json(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.json"):
         data = [asdict(item) for item in items]
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"💾 Saved: {filename}")
+        print(f"Saved: {filename}")
     
     def save_to_excel(self, items: List[TourismItem], filename: str = "bogor_tourism_data_clean.xlsx"):
         df = self.to_dataframe(items)
         df.to_excel(filename, index=False, engine='openpyxl')
-        print(f"💾 Saved: {filename}")
+        print(f"Saved: {filename}")
 
 
 def main():
@@ -439,10 +439,10 @@ def main():
     df_raw = scraper.to_dataframe(all_items)
     df_clean = clean_tourism_dataframe(df_raw)
     
-    print("\n📊 KOLOM DATA:")
+    print("\nKOLOM DATA:")
     print(df_clean.columns.tolist())
     
-    print("\n📊 PREVIEW:")
+    print("\nPREVIEW:")
     print(df_clean[['nama', 'alamat', 'harga_tiket', 'jam_operasional']].head(5))
 
     print(f"\nRaw: {len(df_raw)} destinasi")
@@ -453,14 +453,14 @@ def main():
 
     df_clean.to_csv("bogor_tourism_data_clean.csv", index=False, encoding="utf-8-sig")
     df_clean.to_json("bogor_tourism_data_clean.json", orient="records", force_ascii=False, indent=2)
-    print("💾 Saved: bogor_tourism_data_clean.csv")
-    print("💾 Saved: bogor_tourism_data_clean.json")
+    print("Saved: bogor_tourism_data_clean.csv")
+    print("Saved: bogor_tourism_data_clean.json")
     
     try:
         df_clean.to_excel("bogor_tourism_data_clean.xlsx", index=False, engine="openpyxl")
-        print("💾 Saved: bogor_tourism_data_clean.xlsx")
+        print("Saved: bogor_tourism_data_clean.xlsx")
     except:
-        print("⚠️ Install openpyxl for Excel export")
+        print("Install openpyxl for Excel export")
     
     return df_clean
 

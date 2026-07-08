@@ -41,7 +41,7 @@ class BogorTourismSeleniumScraper(BogorTourismScraper):
             time.sleep(self.delay * 0.5)
             return BeautifulSoup(self.driver.page_source, "html.parser")
         except Exception as exc:
-            print(f"❌ Selenium error: {exc}")
+            print(f"Selenium error: {exc}")
             return None
 
     def close(self):
@@ -55,10 +55,10 @@ def main():
         df_raw = scraper.to_dataframe(all_items)
         df_clean = clean_tourism_dataframe(df_raw)
 
-        print("\n📊 KOLOM DATA:")
+        print("\nKOLOM DATA:")
         print(df_clean.columns.tolist())
 
-        print("\n📊 PREVIEW:")
+        print("\nPREVIEW:")
         print(df_clean[["nama", "alamat", "harga_tiket", "jam_operasional"]].head(5))
 
         print(f"\nRaw: {len(df_raw)} destinasi")
@@ -74,14 +74,14 @@ def main():
             force_ascii=False,
             indent=2,
         )
-        print("💾 Saved: bogor_tourism_data_clean_selenium.csv")
-        print("💾 Saved: bogor_tourism_data_clean_selenium.json")
+        print("Saved: bogor_tourism_data_clean_selenium.csv")
+        print("Saved: bogor_tourism_data_clean_selenium.json")
 
         try:
             df_clean.to_excel("bogor_tourism_data_clean_selenium.xlsx", index=False, engine="openpyxl")
-            print("💾 Saved: bogor_tourism_data_clean_selenium.xlsx")
+            print("Saved: bogor_tourism_data_clean_selenium.xlsx")
         except Exception:
-            print("⚠️ Install openpyxl for Excel export")
+            print("Install openpyxl for Excel export")
 
         return df_clean
     finally:

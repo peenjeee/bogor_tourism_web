@@ -9,9 +9,9 @@ CORS(app)  # Enable CORS for Laravel
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Initialize recommender
-print("🚀 Initializing Tourism Recommender...")
+print("Initializing Tourism Recommender...")
 recommender = TourismRecommender(data_path=os.path.join(BASE_DIR, 'data'))
-print("✅ Ready!")
+print("Ready!")
 
 @app.route('/')
 def index():
@@ -103,7 +103,7 @@ def get_recommendations():
         place_details = None
         top_n = data.get('top_n', 10)
         
-        print(f"🔍 REQUEST: {data}")
+        print(f"REQUEST: {data}")
 
         # 1. Try lookup by NAME first (Most reliable if IDs don't match)
         if 'place_name' in data and data['place_name']:
@@ -113,7 +113,7 @@ def get_recommendations():
                 place_idx = search_result['query_idx']
                 # Get details using this index
                 place_details = recommender.get_place_by_id(place_idx)
-                print(f"   ✅ Found by name: Index {place_idx} -> {place_details['nama']}")
+                print(f"   Found by name: Index {place_idx} -> {place_details['nama']}")
         
         # 2. Fallback to ID if provided and Name lookup failed
         if place_idx is None and 'place_id' in data:
@@ -125,14 +125,14 @@ def get_recommendations():
                 if 0 <= potential_idx < len(recommender.df):
                     place_idx = potential_idx
                     place_details = recommender.get_place_by_id(place_idx)
-                    print(f"   ✅ Using ID as Index: Index {place_idx} -> {place_details['nama']}")
+                    print(f"   Using ID as Index: Index {place_idx} -> {place_details['nama']}")
                 else:
-                    print(f"   ❌ ID {potential_idx} is out of bounds (0-{len(recommender.df)-1})")
+                    print(f"   ID {potential_idx} is out of bounds (0-{len(recommender.df)-1})")
             except ValueError:
                 pass
         
         if place_idx is None:
-            print("   ❌ Place not found")
+            print("   Place not found")
             return jsonify({
                 'status': 'error',
                 'message': 'Place not found. Provide valid place_name or place_id.'
@@ -151,7 +151,7 @@ def get_recommendations():
         })
     except Exception as e:
         import traceback
-        print(f"❌ API ERROR: {str(e)}")
+        print(f"API ERROR: {str(e)}")
         traceback.print_exc()
         return jsonify({
             'status': 'error',

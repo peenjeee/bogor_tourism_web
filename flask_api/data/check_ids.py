@@ -18,14 +18,14 @@ try:
         # Check alignment
         mismatch = df[df.index != df['id']]
         if not mismatch.empty:
-            print(f"\n⚠️ Mismatch found! {len(mismatch)} rows have Index != ID")
+            print(f"\nMismatch found! {len(mismatch)} rows have Index != ID")
             print("Example Mismatch:")
             print(mismatch[['id', 'nama']].head(3))
         else:
-            print("\n✅ Index matches ID exactly!")
+            print("\nIndex matches ID exactly!")
             
     else:
-        print("\n⚠️ 'id' column NOT FOUND in CSV. Pure index usage.")
+        print("\n'id' column NOT FOUND in CSV. Pure index usage.")
         
 except Exception as e:
     print(f"Error: {e}")

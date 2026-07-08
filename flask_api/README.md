@@ -1,6 +1,5 @@
 ---
 title: Bogor Xplore API
-emoji: 🏞️
 colorFrom: green
 colorTo: blue
 sdk: docker

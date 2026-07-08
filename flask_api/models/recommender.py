@@ -24,7 +24,7 @@ class TourismRecommender:
     """
     
     def __init__(self, data_path='data/'):
-        print("🚀 Initializing Tourism Recommender...")
+        print("Initializing Tourism Recommender...")
         
         self.data_path = data_path
         
@@ -37,7 +37,7 @@ class TourismRecommender:
         indobert_embeddings_path = os.path.join(data_path, 'indobert_embeddings.npy')
         
         # Load data
-        print("   📂 Loading pre-computed data from dataset...")
+        print("   Loading pre-computed data from dataset...")
         self.df = pd.read_csv(data_csv_path)
 
         if 'deskripsi_clean' in self.df.columns:
@@ -62,8 +62,8 @@ class TourismRecommender:
         # Load similarity matrices
         self.ngram_sim = self._expand_square_matrix(np.load(ngram_similarity_path), 'ngram_similarity')
         self.indobert_sim = self._expand_square_matrix(np.load(indobert_similarity_path), 'indobert_similarity')
-        print(f"   ✅ Loaded ngram_similarity: {self.ngram_sim.shape}")
-        print(f"   ✅ Loaded indobert_similarity: {self.indobert_sim.shape}")
+        print(f"   Loaded ngram_similarity: {self.ngram_sim.shape}")
+        print(f"   Loaded indobert_similarity: {self.indobert_sim.shape}")
         
         # Load TF-IDF untuk query search (if needed)
         self.tfidf_matrix = self._expand_rows(np.load(tfidf_matrix_path), 'tfidf_matrix')
@@ -75,15 +75,15 @@ class TourismRecommender:
         self.indobert_embeddings = self._expand_rows(np.load(indobert_embeddings_path), 'indobert_embeddings')
         
         # Load IndoBERT model untuk query embedding
-        print("   📥 Loading IndoBERT model for query encoding...")
+        print("   Loading IndoBERT model for query encoding...")
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.tokenizer = AutoTokenizer.from_pretrained("indobenchmark/indobert-base-p1")
         self.model = AutoModel.from_pretrained("indobenchmark/indobert-base-p1")
         self.model.eval()
         self.model.to(self.device)
-        print(f"   ✅ IndoBERT model loaded! Device: {self.device}")
+        print(f"   IndoBERT model loaded! Device: {self.device}")
         
-        print(f"\n✅ Recommender ready!")
+        print(f"\nRecommender ready!")
         print(f"   Total destinations: {len(self.df)}")
         print(f"   Method: IndoBERT (Search) & N-Gram (Detail Recommendations)")
 
@@ -99,7 +99,7 @@ class TourismRecommender:
             expanded = np.zeros((target_len, target_len), dtype=matrix.dtype)
             expanded[np.ix_(self.valid_text_indices, self.valid_text_indices)] = matrix
             np.fill_diagonal(expanded, 1.0)
-            print(f"   ↔️ Expanded {name}: {matrix.shape} -> {expanded.shape}")
+            print(f"   Expanded {name}: {matrix.shape} -> {expanded.shape}")
             return expanded
 
         raise ValueError(
@@ -120,7 +120,7 @@ class TourismRecommender:
             expanded_shape = (target_len, *values.shape[1:])
             expanded = np.zeros(expanded_shape, dtype=values.dtype)
             expanded[self.valid_text_indices] = values
-            print(f"   ↔️ Expanded {name}: {values.shape} -> {expanded.shape}")
+            print(f"   Expanded {name}: {values.shape} -> {expanded.shape}")
             return expanded
 
         raise ValueError(
@@ -183,7 +183,7 @@ class TourismRecommender:
         """
         # Validate index
         if place_idx is None or place_idx < 0 or place_idx >= len(self.df):
-            print(f"❌ Invalid Place Index: {place_idx}")
+            print(f"Invalid Place Index: {place_idx}")
             return []
         
         # Use pre-computed N-Gram similarity matrix directly
@@ -316,14 +316,14 @@ class TourismRecommender:
             
             if place_idx is not None:
                 # Use pre-computed IndoBERT similarity matrix (like notebook)
-                print(f"   📊 Using IndoBERT similarity matrix for place: {self.df.iloc[place_idx]['nama']}")
+                print(f"   Using IndoBERT similarity matrix for place: {self.df.iloc[place_idx]['nama']}")
                 sim_scores = self.indobert_sim[place_idx]
                 
                 # Get top N (excluding itself at index 0)
                 top_indices = sim_scores.argsort()[::-1][1:top_n+1]
             else:
                 # Fall back to on-the-fly query encoding
-                print(f"   🔍 Query not found as place name, using query encoding...")
+                print(f"   Query not found as place name, using query encoding...")
                 query_emb = self._get_query_embedding(query)
                 query_emb = query_emb.reshape(1, -1)
                 sim_scores = cosine_similarity(query_emb, self.indobert_embeddings)[0]
@@ -333,7 +333,7 @@ class TourismRecommender:
             for idx in top_indices:
                 # SAFEGUARD: Ignore indices that are out of bounds
                 if idx >= len(self.df):
-                    print(f"   ⚠️ Ignored out-of-bounds index: {idx}")
+                    print(f"   Ignored out-of-bounds index: {idx}")
                     continue
                     
                 place = self.df.iloc[idx]

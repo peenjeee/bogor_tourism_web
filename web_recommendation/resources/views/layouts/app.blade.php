@@ -160,7 +160,7 @@
                         Daftar Wisata
                         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
                     </a>
-                    <a href="{{ route('recommendations.location') }}" class="nav-link font-medium relative group">
+                    <a href="{{ route('recommendations.location') }}" class="nav-link font-medium relative group" style="display: none;">
                         Rekomendasi Lokasi
                         <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300"></span>
                     </a>
@@ -233,7 +233,7 @@
                 <a href="{{ route('places.index') }}" class="block nav-link font-medium py-2">
                     Daftar Wisata
                 </a>
-                <a href="{{ route('recommendations.location') }}" class="block nav-link font-medium py-2">
+                <a href="{{ route('recommendations.location') }}" class="block nav-link font-medium py-2" style="display: none;">
                     Rekomendasi Lokasi
                 </a>
                 <!-- Mobile Search in Menu -->
@@ -281,7 +281,7 @@
                     <a href="{{ route('places.index') }}" class="footer-link">
                         Daftar Wisata
                     </a>
-                    <a href="{{ route('recommendations.location') }}" class="footer-link">
+                    <a href="{{ route('recommendations.location') }}" class="footer-link" style="display: none;">
                         Rekomendasi Lokasi
                     </a>
                 </div>
